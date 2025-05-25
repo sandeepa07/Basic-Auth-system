@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register</title>
+</head>
+<body>
+  <h1>Register</h1>
+   <form action="/api/v1/auth/signup" method="POST">
+    <label>
+      Name:
+      <input type="text" name="name" required />
+    </label><br /><br />
+    <label>
+      Email:
+      <input type="email" name="email" required />
+    </label><br /><br />
+    <label>
+      Mobile Number:
+      <input type="text" name="mobile_number" required />
+    </label><br /><br />
+    <label>
+      Gender:
+      <select name="gender" required>
+        <option value="">Select</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+    </label><br /><br />
+    <label>
+      Password:
+      <input type="password" name="password" required minlength="8" />
+    </label><br /><br />
+    <label>
+      Confirm Password:
+      <input type="password" name="confirm_password" required minlength="8" />
+    </label><br /><br />
+    <button type="submit">Sign Up</button>
+  </form>
+
+  <p id="message"></p>
+
+  <script>
+    const form = document.getElementById('registerForm');
+    const message = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      message.textContent = '';
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      if (data.password !== data.confirm_password) {
+        message.textContent = 'Passwords do not match!';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          message.style.color = 'green';
+          message.textContent = 'Registration successful! Redirecting to dashboard...';
+          setTimeout(() => window.location.href = '/dashboard.html', 1500);
+        } else {
+          message.style.color = 'red';
+          message.textContent = result.message || 'Registration failed';
+        }
+      } catch (err) {
+        message.style.color = 'red';
+        message.textContent = 'Server error. Try again later.';
+      }
+    });
+  </script>
+</body>
+</html>
